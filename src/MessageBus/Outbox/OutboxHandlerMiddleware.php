@@ -13,12 +13,12 @@ use Telephantast\MessageBus\Transaction\TransactionProvider;
 /**
  * @api
  */
-final class HandlerOutboxMiddleware implements Middleware
+final class OutboxHandlerMiddleware implements Middleware
 {
     public function __construct(
         private readonly OutboxStorage $outboxStorage,
         private readonly TransactionProvider $transactionProvider,
-        private readonly TransportPublish $publish,
+        private readonly TransportPublish $transportPublish,
     ) {}
 
     public function handle(MessageContext $messageContext, Pipeline $pipeline): mixed
@@ -42,7 +42,7 @@ final class HandlerOutboxMiddleware implements Middleware
         });
 
         if ($outbox->envelopes !== []) {
-            $this->publish->publish($outbox->envelopes);
+            $this->transportPublish->publish($outbox->envelopes);
             $this->outboxStorage->empty(null, $messageId);
         }
 
